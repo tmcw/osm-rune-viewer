@@ -17,6 +17,23 @@
             width: 300px;
             overflow:auto;
             box-sizing:border-box;
+            padding:10px;
+        }
+        small {
+            color:#aaa;
+        }
+        table {
+            border-collapse: collapse;
+        }
+        table tr.active td {
+            background:yellow;
+        }
+        table tr td {
+            border-bottom:1px solid #eee;
+        }
+        table tr td {
+            width: 50px;
+            overflow:hidden;
             padding:5px;
         }
     </style>
@@ -26,7 +43,17 @@
 <div id='map'></div>
 <div id='chars'>
     <strong>OpenStreetMap by the letters</strong>
-    <ul id='letters'></ul>
+    <p>This is a viewer of data processed by <a href='https://github.com/tmcw/osm-rune'>osm-rune</a>,
+    a script that looks at the <code>name</code> tag of every node in OpenStreetMap
+    and counts characters (or more precisely, <a href='http://blog.golang.org/strings'>runes</a>).
+    Click on a character on the right to view its distribution throughout the world.</p>
+    <table id='letters'>
+        <tr>
+            <td>codepoint</td>
+            <td>rep</td>
+            <td>count</td>
+        </tr>
+    </table>
 </div>
 <script>
 $.getJSON('planet-2.json', function(planet) {
@@ -35,14 +62,25 @@ $.getJSON('planet-2.json', function(planet) {
         for (var a in all) {
             // that darn right to left mark
             if (a !== '8207') {
-                var li = letters.appendChild(document.createElement('li'));
-                li.innerHTML = String.fromCharCode(+a) + ' (' + all[a] + ')';
-                li.codePoint = a;
+                var tr = letters.appendChild(document.createElement('tr'));
+                var number = tr.appendChild(document.createElement('td'));
+                number.innerHTML = a;
+                var asChar = tr.appendChild(document.createElement('td'));
+                asChar.innerHTML = String.fromCharCode(+a);
+                var count = tr.appendChild(document.createElement('td'));
+                count.innerHTML = all[a];
+                tr.onclick = (function(codePoint) {
+                    return function() {
+                        stylize(codePoint);
+                        var actives = document.getElementsByClassName('active');
+                        for (var i = 0; i < actives.length; i++) actives[i].className='';
+                        this.className = 'active';
+                    }
+                })(a);
             }
         }
         document.body.addEventListener('click', function(e) {
             if (e.target.codePoint) {
-                stylize(e.target.codePoint);
             }
         });
         L.mapbox.accessToken = 'pk.eyJ1IjoidG1jdyIsImEiOiJIZmRUQjRBIn0.lRARalfaGHnPdRcc-7QZYQ';
