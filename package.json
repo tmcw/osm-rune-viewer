@@ -1,0 +1,14 @@
+{
+  "name": "osm-rune-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate": "node generate.js > tiles.geojson"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tilebelt": "^0.5.3"
+  }
+}

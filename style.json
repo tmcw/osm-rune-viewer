@@ -1,0 +1,39 @@
+{
+  "version": 5,
+  "sprite": "https://www.mapbox.com/mapbox-gl-styles/sprites/outdoors",
+  "glyphs": "mapbox://fontstack/{fontstack}/{range}.pbf",
+  "constants": {
+    "@land": "rgb(244,239,225)",
+    "@water": "#cdd"
+  },
+  "sources": {
+    "mapbox": {
+      "type": "vector",
+      "url": "mapbox://mapbox.mapbox-terrain-v1,mapbox.mapbox-streets-v6-dev",
+      "maxzoom": 15
+    }
+  },
+  "layers": [{
+    "id": "background",
+    "style": {
+      "background-color": "@land"
+    },
+    "style.night": {
+      "background-color": "@land_night"
+    },
+    "type": "background"
+  }, {
+    "id": "water",
+    "source": "mapbox",
+    "source-layer": "water",
+    "style": {
+      "fill-color": "@water",
+      "fill-outline-color": "#a2bdc0"
+    },
+    "style.night": {
+      "fill-color": "@water_night",
+      "fill-outline-color": "@water_dark_night"
+    },
+    "type": "fill"
+  }]
+}
