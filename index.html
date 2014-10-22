@@ -5,35 +5,71 @@
     <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.3/mapbox.js'></script>
+    <script src='https://code.jquery.com/jquery-2.1.1.min.js'></script>
     <script src='chroma.min.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.3/mapbox.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
+        #map { position:absolute; top:0; bottom:0; left:0; right: 300px; }
+        #chars {
+            position:absolute;
+            top:0; bottom:0; right:0;
+            width: 300px;
+            overflow:auto;
+            box-sizing:border-box;
+            padding:5px;
+        }
     </style>
 </head>
 <body>
 
 <div id='map'></div>
+<div id='chars'>
+    <strong>OpenStreetMap by the letters</strong>
+    <ul id='letters'></ul>
+</div>
 <script>
-L.mapbox.accessToken = 'pk.eyJ1IjoidG1jdyIsImEiOiJIZmRUQjRBIn0.lRARalfaGHnPdRcc-7QZYQ';
-var map = L.mapbox.map('map', 'tmcw.map-dsejpecw')
-    .setView([0, 0], 2);
-L.mapbox.featureLayer('./tiles.geojson')
-    .addTo(map)
-    .on('ready', stylize);
-
-var scale = chroma.scale(['lightyellow', 'navy']).domain([0, 1]);
-
-function stylize(e) {
-    var layer = e.target;
-    layer.eachLayer(function(l) {
-        l.setStyle({
-            stroke: false,
-            fillColor: scale(Math.random())
+$.getJSON('planet-2.json', function(planet) {
+    $.getJSON('all.json', function(all) {
+        var letters = document.getElementById('letters');
+        for (var a in all) {
+            // that darn right to left mark
+            if (a !== '8207') {
+                var li = letters.appendChild(document.createElement('li'));
+                li.innerHTML = String.fromCharCode(+a) + ' (' + all[a] + ')';
+                li.codePoint = a;
+            }
+        }
+        document.body.addEventListener('click', function(e) {
+            if (e.target.codePoint) {
+                stylize(e.target.codePoint);
+            }
         });
-    });
-}
+        L.mapbox.accessToken = 'pk.eyJ1IjoidG1jdyIsImEiOiJIZmRUQjRBIn0.lRARalfaGHnPdRcc-7QZYQ';
+        var map = L.mapbox.map('map', 'tmcw.map-dsejpecw')
+            .setView([0, 0], 2);
+        var tiles = L.mapbox.featureLayer('./tiles.geojson')
+            .addTo(map);
+        var scale = chroma.scale(['lightyellow', 'navy']).domain([0, 1]);
+        function stylize(codePoint) {
+            tiles.eachLayer(function(l) {
+                if (!planet[l.feature.properties.key]) {
+                    l.setStyle({
+                        stroke: false,
+                        fill: false
+                    });
+                } else {
+                    var hasCode = planet[l.feature.properties.key][codePoint];
+                    l.setStyle({
+                        stroke: false,
+                        fillColor: hasCode ? scale(1) : scale(0)
+                    });
+                }
+            });
+        }
+   });
+});
+
 </script>
 
 </body>
