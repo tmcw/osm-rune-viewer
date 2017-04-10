@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "tilebelt": "^0.5.3"
+    "tilebelt": "^1.0.1"
   }
 }
